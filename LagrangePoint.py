@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import matplotlib.animation as animation
 from scipy.integrate import solve_ivp
+import constants as c
 
 # Some Constants
 N = int(1e3)
-tspan = np.linspace(0, 5*yr2s, N) # s
+tspan = np.linspace(0, 5*c.yr2s, N) # s
 
 # Initial Condition
 #Init = [rE*np.cos(np.pi/3), rE*np.sin(np.pi/3), 1e3, 1e3]
@@ -63,6 +64,7 @@ ax.plot(rE*np.cos(theta), rE*np.sin(theta), color='deepskyblue', linewidth=1, zo
 
 # Gravi. Field Contour
 
+X = np.linspace()
 #xx, yy = 
 
 
@@ -89,8 +91,8 @@ def init():
 
 
 #ax.plot(X, Y)
-ax.set_xlim([-2e11, 2e11])
-ax.set_ylim([-2e11, 2e11])
+ax.set_xlim([-c.Boxsize, c.Boxsize)
+ax.set_ylim([-c.Boxsize, c.Boxsize)
 ax.set_xlabel('x (m)')
 ax.set_ylabel('y (m)')
 

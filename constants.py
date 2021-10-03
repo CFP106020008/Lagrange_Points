@@ -4,3 +4,4 @@ day2s = 86400 # s
 yr2s = 86400*365.2425 # s
 omega = np.array([0, 0, 2*np.pi/yr2s]) # 1/s
 rE = 149.6e9 # m
+Boxsize = 2e11 # m

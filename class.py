@@ -32,21 +32,22 @@ class probe:
         # Creating an array to store force
         a = np.zeros(3)
         ag = np.zeros(3)
+        
         # Gravity
         for body in self.SourceList:
             vec_r = np.array([(self.x - body.x), (self.y - body.y), (self.z - body.z)])
             r = np.linalg.norm(vec_r)
-            ag += -G*body.M/r**3*vec_r
+            ag += -c.G*body.M/r**3*vec_r
         self.ag = ag
         a += ag
 
         # Centrifugal
-        acen = -np.cross(omega, np.cross(omega, np.array([self.x, self.y, self.z])))
+        acen = -np.cross(c.omega, np.cross(c.omega, np.array([self.x, self.y, self.z])))
         a += acen
         self.acen = acen
         
         # Coriolis
-        acor = -2*np.cross(omega, np.array([self.vx, self.vy, self.vz]))
+        acor = -2*np.cross(c.omega, np.array([self.vx, self.vy, self.vz]))
         a += acor
         self.acor = acor
         
