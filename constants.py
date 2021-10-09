@@ -14,3 +14,5 @@ BoxSize = 2e11
 dt = day2s
 resize = 5e12
 arrowsize = 5e9
+tspan = 5*yr2s
+N = int(1e3)
