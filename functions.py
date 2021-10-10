@@ -71,7 +71,17 @@ def Plot_Contour(SourceList, fig, ax, fill=False):
                 linestyles='-')
     return
 
-def save_frame(i, ProbeList, fig, ax):
+def set_plot_dimensions(fig, ax):
+    ax.set_xlim([-c.BoxSize, c.BoxSize])
+    ax.set_ylim([-c.BoxSize, c.BoxSize])
+    ax.set_xlabel('x (m)')
+    ax.set_ylabel('y (m)')
+    return
+
+def save_frame(frame, i,
+               SourceList, ProbeList, 
+               X, Y, aCor, aCen, aG,
+               fig, ax):
     ax.cla()
     for j, Probe in enumerate(ProbeList):
         ax.plot(X[j, max(0, i-c.tail):i], Y[j, max(0, i-c.tail):i], color='cyan', linestyle='-', linewidth=1)
@@ -83,22 +93,8 @@ def save_frame(i, ProbeList, fig, ax):
     ax.set_ylim([-c.BoxSize, c.BoxSize])
     ax.set_xlabel('x (m)')
     ax.set_ylabel('y (m)')
-    set_plot_dimension(fig, ax)
-    Lv=np.linspace(np.max(g)-np.std(g)*0.7, np.max(g), 50)
-    ax.contourf(xx, yy, g, 
-                zorder=1, 
-                levels = Lv,
-                norm=SymLogNorm(linthresh=1, base=10),
-                extend='both',
-                alpha = 0.5,
-                #cmap='cividis')
-                cmap='gray')
-    Plot_Static(SourceList)
-    fig.savefig("./Frames/frame_{:04d}.jpg".format(i), dpi=300)
+    set_plot_dimensions(fig, ax)
+    Plot_Static(SourceList, fig, ax)
+    Plot_Contour(SourceList, fig, ax, fill=False)
+    fig.savefig("./Frames/frame_{:04d}.jpg".format(frame), dpi=300)
 
-def set_plot_dimensions(fig, ax):
-    ax.set_xlim([-c.BoxSize, c.BoxSize])
-    ax.set_ylim([-c.BoxSize, c.BoxSize])
-    ax.set_xlabel('x (m)')
-    ax.set_ylabel('y (m)')
-    return

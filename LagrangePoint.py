@@ -87,7 +87,7 @@ ani = animation.FuncAnimation(
     repeat=False)
 #ani.save("movie.mp4", dpi=300, fps=20)
 
-for i in tqdm(np.arange(0, frames, 10)):
-    f.save_frame(i, ProbeList, fig, ax)
+for i, frame in enumerate(tqdm(np.arange(0, frames, 10))):
+    f.save_frame(i, frame, SourceList, ProbeList, X, Y, aCor, aCen, aG, fig, ax)
 
 plt.show()
