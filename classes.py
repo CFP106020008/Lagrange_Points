@@ -1,6 +1,6 @@
 import constants as c
 import numpy as np
-from scipy.integrate import solve_ivp
+#from scipy.integrate import solve_ivp
 
 class BigBody:
     # This class stores the body that is stationary in Earth co-rotating coord.
