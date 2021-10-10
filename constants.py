@@ -24,8 +24,8 @@ BoxSize = rE*1.5 # Size of the animation box
 dt = 0.5*day2s # Simulation time resolution
 resize = 25*BoxSize
 arrowsize = 2.5e-2*BoxSize
-tspan = 8*yr2s # s
-tail = 20 # frames
+tspan = 10*yr2s # s
+tail = 200 # frames
 
 def Set_Sources(M1, M2, R):
     omega  = np.array([0, 0, np.sqrt(G*(M1+M2)/R**3)])
@@ -34,4 +34,4 @@ def Set_Sources(M1, M2, R):
     SourceList = [Sun, Planet]
     return SourceList, omega
 
-SourceList, omega = Set_Sources(Msun, ME, rE)
+SourceList, omega = Set_Sources(Msun, Msun*0.05, rE)
