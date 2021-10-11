@@ -20,7 +20,7 @@ TJ = (rJ/rE)**(3/2)*yr2s
 MJ = 317.8*ME
 
 # Here are parameters
-BoxSize = rE*1.5 # Size of the animation box
+BoxSize = rJ*1.5 # Size of the animation box
 dt = 0.5*day2s # Simulation time resolution
 resize = 25*BoxSize
 arrowsize = 2.5e-2*BoxSize
@@ -34,4 +34,4 @@ def Set_Sources(M1, M2, R):
     SourceList = [Sun, Planet]
     return SourceList, omega
 
-SourceList, omega = Set_Sources(Msun, Msun*0.05, rE)
+SourceList, omega = Set_Sources(Msun, MJ, rJ)

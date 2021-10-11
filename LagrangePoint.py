@@ -4,6 +4,7 @@ from tqdm import tqdm
 import matplotlib.animation as animation
 import constants as c
 import functions as f
+import init
 from classes import BigBody, probe
 from matplotlib.colors import SymLogNorm
 
@@ -16,28 +17,10 @@ fig, ax = plt.subplots(figsize=(6, 6))
 fig.set_facecolor('#303030')
 ax.set_facecolor('#303030')
 
-
 SourceList = c.SourceList
-ProbeList = []
-'''
-for i in range(5):
-    for j in range(5):
-        ProbeList.append(probe(c.BoxSize/5*i, c.BoxSize/5*j, 0, 0, 0, 0, SourceList, c.tspan))
-'''
-#Init = [c.BoxSize/5*2, c.BoxSize/5*0, 0, 0, 0, 0, SourceList, c.tspan]
-Init1 = [c.rE*np.cos(np.pi/3)+SourceList[0].x-5e4, c.rE*np.sin(np.pi/3), 0, 0, 0, 0, SourceList, c.tspan]
-Init2 = [c.rE*np.cos(np.pi/3)+SourceList[0].x-5e5, c.rE*np.sin(np.pi/3), 0, 0, 0, 0, SourceList, c.tspan]
-Init3 = [c.rE*np.cos(np.pi/3)+SourceList[0].x-5e6, c.rE*np.sin(np.pi/3), 0, 0, 0, 0, SourceList, c.tspan]
-        
+ProbeList = init.Random_Around(c.rJ*np.cos(np.pi/3)+SourceList[0].x, c.rJ*np.sin(np.pi/3), 10, 1e7, 1e7)
 
-Probe1 = probe(Init1[0], Init1[1], Init1[2], Init1[3], Init1[4], Init1[5], SourceList, c.tspan)
-Probe2 = probe(Init2[0], Init2[1], Init2[2], Init2[3], Init2[4], Init2[5], SourceList, c.tspan)
-Probe3 = probe(Init3[0], Init3[1], Init3[2], Init3[3], Init3[4], Init3[5], SourceList, c.tspan)
-ProbeList.append(Probe1)
-ProbeList.append(Probe2)
-ProbeList.append(Probe3)
-
-# To record the position of the probe
+# To record the position of the probes
 X = np.zeros((len(ProbeList), frames))
 Y = np.zeros((len(ProbeList), frames))
 aCor = np.zeros((len(ProbeList), frames, 2))
@@ -86,8 +69,8 @@ ani = animation.FuncAnimation(
     blit=True, 
     repeat=False)
 #ani.save("movie.mp4", dpi=300, fps=20)
-
+'''
 for i, frame in enumerate(tqdm(np.arange(0, frames, 10))):
     f.save_frame(i, frame, SourceList, ProbeList, X, Y, aCor, aCen, aG, fig, ax)
-
+'''
 plt.show()

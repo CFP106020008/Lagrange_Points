@@ -96,5 +96,5 @@ def save_frame(frame, i,
     set_plot_dimensions(fig, ax)
     Plot_Static(SourceList, fig, ax)
     Plot_Contour(SourceList, fig, ax, fill=False)
-    fig.savefig("./Frames/frame_{:04d}.jpg".format(frame), dpi=300)
+    fig.savefig("./Frames/frame_{:04d}.jpg".format(frame), dpi=300, facecolor='#303030')
 
