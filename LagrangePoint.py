@@ -18,7 +18,7 @@ fig.set_facecolor('#303030')
 ax.set_facecolor('#303030')
 
 SourceList = c.SourceList
-ProbeList = init.Random_Around(c.rJ*np.cos(np.pi/3)+SourceList[0].x, c.rJ*np.sin(np.pi/3), 10, 1e7, 1e7)
+ProbeList  = c.ProbeList
 
 # To record the position of the probes
 X = np.zeros((len(ProbeList), frames))
@@ -41,7 +41,6 @@ f.Plot_Static(SourceList, fig, ax)
 
 # Gravi. Field Contour
 f.Plot_Contour(SourceList, fig, ax)
-
 
 # Animations
 def update(i):
@@ -69,8 +68,9 @@ ani = animation.FuncAnimation(
     blit=True, 
     repeat=False)
 #ani.save("movie.mp4", dpi=300, fps=20)
-'''
-for i, frame in enumerate(tqdm(np.arange(0, frames, 10))):
-    f.save_frame(i, frame, SourceList, ProbeList, X, Y, aCor, aCen, aG, fig, ax)
-'''
-plt.show()
+
+if c.SAVE_VIDEO:
+    for i, frame in enumerate(tqdm(np.arange(0, frames, 20))):
+        f.save_frame(i, frame, SourceList, ProbeList, X, Y, aCor, aCen, aG, fig, ax)
+else:
+    plt.show()
