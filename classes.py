@@ -1,6 +1,6 @@
 import constants as c
 import numpy as np
-#from scipy.integrate import solve_ivp
+from scipy.integrate import solve_ivp
 
 class BigBody:
     # This class stores the body that is stationary in Earth co-rotating coord.
@@ -15,7 +15,7 @@ class BigBody:
 
 class probe:
 
-    def __init__(self, x, y, z, vx, vy, vz, SourceList, tspan):
+    def __init__(self, x, y, z, vx, vy, vz, SourceList, tspan, omega):
         self.x  = x
         self.y  = y
         self.z = z
@@ -27,6 +27,7 @@ class probe:
         self.ag =   np.array([0,0,0])
         self.SourceList = SourceList
         self.tspan = tspan
+        self.omega = omega
         return
     
     def get_a(self):
@@ -43,12 +44,12 @@ class probe:
         a += ag
 
         # Centrifugal
-        acen = -np.cross(c.omega, np.cross(c.omega, np.array([self.x, self.y, self.z])))
+        acen = -np.cross(self.omega, np.cross(self.omega, np.array([self.x, self.y, self.z])))
         a += acen
         self.acen = acen
         
         # Coriolis
-        acor = -2*np.cross(c.omega, np.array([self.vx, self.vy, self.vz]))
+        acor = -2*np.cross(self.omega, np.array([self.vx, self.vy, self.vz]))
         a += acor
         self.acor = acor
         
@@ -56,11 +57,11 @@ class probe:
 
         return a
     
-    def solve_path(tspan):
-        sol = solve_ivp(function = get_a,
-                        t_span = [0, self.tspan[-1]], 
+    def solve_path(self, tspan):
+        sol = solve_ivp(function = self.get_a,
+                        t_span = [0, self.tspan], 
                         y_0 = self.get_P(), 
-                        t_eval = self.tspan,
+                        t_eval = np.linspace(0, self.tspan, 1000),
                         method='DOP853')
         self.T  = sol.t
         Data    = sol.y
@@ -97,11 +98,17 @@ class probe:
 
     def update(self, dt):
         p0 = self.get_P()
-        k1 = self.get_dPdt()*dt
-        self.add_P(k1)
-        k2 = self.get_dPdt()*dt
+        k1 = self.get_dPdt()
+        self.add_P(k1*dt/2)
+        k2 = self.get_dPdt()
         self.assign_P(p0)
-        self.add_P((k1+k2)/2)
+        self.add_P(k2*dt/2)
+        k3 = self.get_dPdt()
+        self.assign_P(p0)
+        self.add_P(k3*dt)
+        k4 = self.get_dPdt()
+        self.assign_P(p0)
+        self.add_P(dt*(k1+2*k2+2*k3+k4)/6)
         return
 
 

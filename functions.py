@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import SymLogNorm
 from scipy.optimize import root
 import constants as c
 import classes as cl
@@ -45,24 +46,28 @@ def Plot_Static(SourceList, fig, ax):
     #ax.plot(Planet.x*np.cos(theta), Planet.x*np.sin(theta), color='blue', linewidth=1, zorder=3)
     return
 
-def Plot_Contour(SourceList, fig, ax, fill=False):
-    L = np.linspace(-c.BoxSize, c.BoxSize, 1000)
-    xx, yy = np.meshgrid(L, L)
+def Plot_Contour(SourceList, fig, ax, BoxSize, center=[0,0], fill=False):
+    Lx = np.linspace(-BoxSize+center[0], BoxSize+center[0], 1000)
+    Ly = np.linspace(-BoxSize+center[1], BoxSize+center[1], 1000)
+    xx, yy = np.meshgrid(Lx, Ly)
     g = np.zeros((1000, 1000))
     for Source in SourceList: # Gravity from all sources
         r = ((xx - Source.x)**2 + (yy - Source.y)**2)**0.5
         g += -c.G*Source.M/r
-    R = ((xx-0)**2 + (yy-0)**2)**0.5 # Distance from the origin
-    g -= 0.5*(R*np.linalg.norm(c.omega))**2 # Centrifugal Force
+    omega = np.array([0, 0, np.sqrt(c.G*(SourceList[0].M+SourceList[1].M)/(SourceList[1].x**2+SourceList[1].y**2)**(3/2))])
+    R = ((xx)**2 + (yy)**2)**0.5 # Distance from the origin
+    g -= 0.5*(R*np.linalg.norm(omega))**2 # Centrifugal Force
+    g[g < 1.1*np.max(g)] = 1.1*np.max(g)
+    print(g)
     def U_L1(SourceList):
         Sun = SourceList[0]
         Planet = SourceList[1]
         xL1 = Find_Lagrange_Points(SourceList)[0][0]
-        U = -c.G*Sun.M/abs(xL1 - Sun.x) - c.G*Planet.M/abs(Planet.x - xL1) - 0.5*(c.omega[2]*xL1)**2
+        U = -c.G*Sun.M/abs(xL1 - Sun.x) - c.G*Planet.M/abs(Planet.x - xL1) - 0.5*(omega[2]*xL1)**2
         return U
-    Lv=np.linspace(0, np.max(g), 70)
-    print('maxg', np.max(g))
-    print('UL1',U_L1(SourceList))
+    Lv=np.linspace(-1e7, np.max(g), 70)
+    #print('maxg', np.max(g))
+    #print('UL1',U_L1(SourceList))
     if fill:
         ax.contourf(xx, yy, g, 
                     zorder=1, 
@@ -74,37 +79,46 @@ def Plot_Contour(SourceList, fig, ax, fill=False):
     ax.contour( xx, yy, g, 
                 zorder=2, 
                 #levels=np.linspace(np.max(g)-0.3*np.std(g), np.max(g), 20),
-                levels=np.linspace(U_L1(SourceList)[0], np.max(g), 20),
-                #norm=SymLogNorm(linthresh=1, base=10),
+                #levels=np.linspace(U_L1(SourceList)[0], np.max(g), 20),
+                #levels=np.linspace(np.max(g), np.max(g)*0.95, int(1e3)),
+                levels=20,
+                norm=SymLogNorm(linthresh=1, base=10),
                 colors='#606060', 
                 linewidths=1,
                 linestyles='-')
     return
 
-def set_plot_dimensions(fig, ax):
-    ax.set_xlim([-c.BoxSize, c.BoxSize])
-    ax.set_ylim([-c.BoxSize, c.BoxSize])
+def set_plot_dimensions(fig, ax, BoxSize, center=[0,0]):
+    ax.set_xlim([-BoxSize+center[0], BoxSize+center[0]])
+    ax.set_ylim([-BoxSize+center[1], BoxSize+center[1]])
     ax.set_xlabel('x (m)')
     ax.set_ylabel('y (m)')
     return
 
-def save_frame(frame, i,
+def save_frame(frame, dt, i,
                SourceList, ProbeList, 
                X, Y, aCor, aCen, aG,
-               fig, ax):
+               fig, ax, BoxSize, tail, resize, arrowsize, center=[0,0]):
     ax.cla()
     for j, Probe in enumerate(ProbeList):
-        ax.plot(X[j, max(0, i-c.tail):i], Y[j, max(0, i-c.tail):i], color='cyan', linestyle='-', linewidth=1)
+        ax.plot(X[j, max(0, i-tail):i], Y[j, max(0, i-tail):i], color='cyan', linestyle='-', linewidth=1)
         ax.plot(X[j,i], Y[j,i], color='cyan', linestyle='-', markersize=5, marker='o')
-        ax.arrow(X[j,i], Y[j,i], aCor[j,i,0]*c.resize, aCor[j,i,1]*c.resize, zorder = 3, head_width=c.arrowsize, head_length=c.arrowsize, fc='r', ec='r')
-        ax.arrow(X[j,i], Y[j,i], aCen[j,i,0]*c.resize, aCen[j,i,1]*c.resize, zorder = 3, head_width=c.arrowsize, head_length=c.arrowsize, fc='y', ec='y')
-        ax.arrow(X[j,i], Y[j,i], aG[j,i,0]*c.resize,   aG[j,i,1]*c.resize,   zorder = 3, head_width=c.arrowsize, head_length=c.arrowsize, fc='skyblue', ec='skyblue') 
-    ax.set_xlim([-c.BoxSize, c.BoxSize])
-    ax.set_ylim([-c.BoxSize, c.BoxSize])
+        ax.arrow(X[j,i], Y[j,i], aCor[j,i,0]*resize, aCor[j,i,1]*resize, zorder = 3, head_width=arrowsize, head_length=arrowsize, fc='r', ec='r')
+        ax.arrow(X[j,i], Y[j,i], aCen[j,i,0]*resize, aCen[j,i,1]*resize, zorder = 3, head_width=arrowsize, head_length=arrowsize, fc='y', ec='y')
+        ax.arrow(X[j,i], Y[j,i], aG[j,i,0]*resize,   aG[j,i,1]*resize,   zorder = 3, head_width=arrowsize, head_length=arrowsize, fc='skyblue', ec='skyblue') 
+    ax.set_xlim([-BoxSize+center[0], BoxSize+center[0]])
+    ax.set_ylim([-BoxSize+center[1], BoxSize+center[1]])
     ax.set_xlabel('x (m)')
     ax.set_ylabel('y (m)')
-    set_plot_dimensions(fig, ax)
+    #set_plot_dimensions(fig, ax, BoxSize)
     Plot_Static(SourceList, fig, ax)
-    Plot_Contour(SourceList, fig, ax, fill=False)
+    Plot_Contour(SourceList, fig, ax, BoxSize, center, fill=False)
+    ax.set_title('Time: {} days'.format(i*dt/c.day2s))
     fig.savefig("./Frames/frame_{:04d}.jpg".format(frame), dpi=300, facecolor='#303030')
 
+def Set_Sources(M1, M2, R):
+    omega  = np.array([0, 0, np.sqrt(c.G*(M1+M2)/R**3)])
+    Sun    = cl.BigBody(M1, -R*(M2/(M1+M2)), 0, 0)
+    Planet = cl.BigBody(M2, R*(M1/(M1+M2)) , 0, 0)
+    SourceList = [Sun, Planet]
+    return SourceList, omega
