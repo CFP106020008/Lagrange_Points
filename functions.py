@@ -58,7 +58,7 @@ def Plot_Contour(SourceList, fig, ax, BoxSize, center=[0,0], fill=False):
     R = ((xx)**2 + (yy)**2)**0.5 # Distance from the origin
     g -= 0.5*(R*np.linalg.norm(omega))**2 # Centrifugal Force
     g[g < 1.1*np.max(g)] = 1.1*np.max(g)
-    print(g)
+    #print(g)
     def U_L1(SourceList):
         Sun = SourceList[0]
         Planet = SourceList[1]
@@ -101,8 +101,8 @@ def save_frame(frame, dt, i,
                fig, ax, BoxSize, tail, resize, arrowsize, center=[0,0]):
     ax.cla()
     for j, Probe in enumerate(ProbeList):
-        ax.plot(X[j, max(0, i-tail):i], Y[j, max(0, i-tail):i], color='cyan', linestyle='-', linewidth=1)
-        ax.plot(X[j,i], Y[j,i], color='cyan', linestyle='-', markersize=5, marker='o')
+        ax.plot(X[j, max(0, i-tail):i], Y[j, max(0, i-tail):i], color='cyan', linestyle='-', linewidth=1, zorder=3)
+        ax.plot(X[j,i], Y[j,i], color='cyan', linestyle='-', markersize=5, marker='o', zorder=4)
         ax.arrow(X[j,i], Y[j,i], aCor[j,i,0]*resize, aCor[j,i,1]*resize, zorder = 3, head_width=arrowsize, head_length=arrowsize, fc='r', ec='r')
         ax.arrow(X[j,i], Y[j,i], aCen[j,i,0]*resize, aCen[j,i,1]*resize, zorder = 3, head_width=arrowsize, head_length=arrowsize, fc='y', ec='y')
         ax.arrow(X[j,i], Y[j,i], aG[j,i,0]*resize,   aG[j,i,1]*resize,   zorder = 3, head_width=arrowsize, head_length=arrowsize, fc='skyblue', ec='skyblue') 
@@ -113,7 +113,7 @@ def save_frame(frame, dt, i,
     #set_plot_dimensions(fig, ax, BoxSize)
     Plot_Static(SourceList, fig, ax)
     Plot_Contour(SourceList, fig, ax, BoxSize, center, fill=False)
-    ax.set_title('Time: {} days'.format(i*dt/c.day2s))
+    ax.set_title('Time: {:.2f} days'.format(i*dt/c.day2s))
     fig.savefig("./Frames/frame_{:04d}.jpg".format(frame), dpi=300, facecolor='#303030')
 
 def Set_Sources(M1, M2, R):

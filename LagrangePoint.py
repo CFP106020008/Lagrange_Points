@@ -10,17 +10,17 @@ from matplotlib.colors import SymLogNorm
 
 # Important parameters
 #BoxSize = c.rM*1.5 # Size of the animation box
-BoxSize = 100000e3 # m
-dt = 0.01*c.day2s # Simulation time resolution
+BoxSize = 10000e3 # m
+dt = 1e-3*c.day2s # Simulation time resolution
 resize = 25*BoxSize
 arrowsize = 2.5e-2*BoxSize
-tspan = 0.5*c.yr2s # s
+tspan = 1*c.yr2s # s
 tail = 200 # frames
 SAVE_VIDEO = True
 
 # Some Constants
 frames = int(tspan/dt)
-Nframe = 600
+Nframe = 5
 
 # Figure
 plt.style.use('dark_background')
@@ -31,10 +31,11 @@ ax.set_facecolor('#303030')
 #SourceList, omega = Set_Sources(Msun, 0.05*Msun, rE)
 SourceList, omega = f.Set_Sources(c.ME, c.MM, c.rM)
 #ProbeList = init.Random_Around(rE*np.cos(np.pi/3)+SourceList[0].x, rE*np.sin(np.pi/3), 20, 1e7, 1e7)
-ProbeList = init.DRO(60000e3, 0, 1, 1e5, 1e5, tspan, SourceList)
-
-#SourceList = c.SourceList
-#ProbeList  = c.ProbeList
+ProbeList = []
+#ProbeList += init.DRO(60000e3, 0, 1, 0, 0, tspan, SourceList, reverse=False)
+#ProbeList += init.DRO(30000e3, 0, 1, 0, 0, tspan, SourceList, reverse=False)
+#ProbeList += init.DRO(20000e3, 0, 1, 0, 0, tspan, SourceList, reverse=False)
+ProbeList += init.DRO(c.RM + 200e3, 0, 1, 0, 0, tspan, SourceList, reverse=False)
 
 # To record the position of the probes
 T = np.zeros((len(ProbeList), frames))
@@ -48,15 +49,13 @@ for i in tqdm(range(int(frames))):
     for j, Probe in enumerate(ProbeList):
         Probe.update(dt)
         T[j,i] = dt*i
-        #Probe.solve_path(tspan)
         X[j,i] = Probe.x
         Y[j,i] = Probe.y
         aCor[j,i,:] = Probe.acor[:2]
         aCen[j,i,:] = Probe.acen[:2]
         aG[j,i,:] = Probe.ag[:2]
 
-print(X)
-print(Y)
+print(X, Y)
 
 # Lagrange point positions
 f.Plot_Static(SourceList, fig, ax)
@@ -85,7 +84,7 @@ f.set_plot_dimensions(fig, ax, BoxSize, center=[SourceList[1].x, SourceList[1].y
 ani = animation.FuncAnimation(
     fig=fig, 
     func=update, 
-    frames=np.arange(0, frames, 2), 
+    frames=np.arange(0, frames, 10), 
     interval=1000/int(frames),
     blit=True, 
     repeat=False)

@@ -22,6 +22,7 @@ TJ = (rJ/rE)**(3/2)*yr2s
 MJ = 317.8*ME
 
 # Moon
-rM = 384400e3 # m
+rM = 384400e3 # m, radius of the moon's orbit
 MM = 7.3477e22 # kg
 TM = (4*np.pi**2/(G*(ME+MM))*rM**3)**0.5
+RM = 1737.4e3 # m, Radius of the moon
