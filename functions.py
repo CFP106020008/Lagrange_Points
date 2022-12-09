@@ -31,8 +31,10 @@ def Plot_Static(SourceList, fig, ax):
     # Lagrange points
     Sun = SourceList[0]
     Planet = SourceList[1]
-    ax.scatter(Sun.x, Sun.y, color='y', s=100, zorder=4)
-    ax.scatter(Planet.x, Planet.y, color='deepskyblue', s=30, zorder=4)
+    ax.scatter(Sun.x, Sun.y, color='skyblue', s=100, zorder=4)
+    #ax.scatter(Sun.x, Sun.y, color='y', s=100, zorder=4)
+    ax.scatter(Planet.x, Planet.y, color='gray', s=30, zorder=4)
+    #ax.scatter(Planet.x, Planet.y, color='deepskyblue', s=30, zorder=4)
     
     LagrangePoints = Find_Lagrange_Points(SourceList)
     ax.scatter(LagrangePoints[0][0], 0, color='w', s=10, zorder=3) # L1
@@ -101,8 +103,14 @@ def save_frame(frame, dt, i,
                fig, ax, BoxSize, tail, resize, arrowsize, center=[0,0]):
     ax.cla()
     for j, Probe in enumerate(ProbeList):
-        ax.plot(X[j, max(0, i-tail):i], Y[j, max(0, i-tail):i], color='cyan', linestyle='-', linewidth=1, zorder=3)
-        ax.plot(X[j,i], Y[j,i], color='cyan', linestyle='-', markersize=5, marker='o', zorder=4)
+        if j >= int(len(ProbeList)/2):
+            #ax.plot(X[j, max(0, i-tail):i], Y[j, max(0, i-tail):i], color='cyan', linestyle='-', linewidth=1, zorder=3)
+            #ax.plot(X[j,i], Y[j,i], color='cyan', linestyle='-', markersize=5, marker='o', zorder=4)
+            ax.plot(X[j, max(0, i-tail):i], Y[j, max(0, i-tail):i], color='orange', linestyle='-', linewidth=1, zorder=3)
+            ax.plot(X[j,i], Y[j,i], color='orange', linestyle='-', markersize=5, marker='o', zorder=4)
+        else:
+            ax.plot(X[j, max(0, i-tail):i], Y[j, max(0, i-tail):i], color='cyan', linestyle='-', linewidth=1, zorder=3)
+            ax.plot(X[j,i], Y[j,i], color='cyan', linestyle='-', markersize=5, marker='o', zorder=4)
         ax.arrow(X[j,i], Y[j,i], aCor[j,i,0]*resize, aCor[j,i,1]*resize, zorder = 3, head_width=arrowsize, head_length=arrowsize, fc='r', ec='r')
         ax.arrow(X[j,i], Y[j,i], aCen[j,i,0]*resize, aCen[j,i,1]*resize, zorder = 3, head_width=arrowsize, head_length=arrowsize, fc='y', ec='y')
         ax.arrow(X[j,i], Y[j,i], aG[j,i,0]*resize,   aG[j,i,1]*resize,   zorder = 3, head_width=arrowsize, head_length=arrowsize, fc='skyblue', ec='skyblue') 
@@ -117,6 +125,7 @@ def save_frame(frame, dt, i,
     fig.savefig("./Frames/frame_{:04d}.jpg".format(frame), dpi=300, facecolor='#303030')
 
 def Set_Sources(M1, M2, R):
+    a = R*M1/(M1+M2)# semi-major axis of M2
     omega  = np.array([0, 0, np.sqrt(c.G*(M1+M2)/R**3)])
     Sun    = cl.BigBody(M1, -R*(M2/(M1+M2)), 0, 0)
     Planet = cl.BigBody(M2, R*(M1/(M1+M2)) , 0, 0)

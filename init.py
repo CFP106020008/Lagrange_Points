@@ -3,6 +3,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 #from LagrangePoint import ProbeList
 from scipy.optimize import root
 import constants as c
@@ -16,7 +17,7 @@ def Random_Around(x, y, n, stdx, stdy):
         ProbeList.append(cl.probe(x[i], y[i], 0, 0, 0, 0, c.SourceList, c.tspan))
     return ProbeList
 
-def DRO(Dx, Dy, n, stdx, stdy, tspan, SourceList, reverse=False):
+def DRO(Dx, Dy, n, stdx, stdy, tspan, SourceList, reverse=False, vy=510):
     '''
     Dx and Dy are the distance "relative" to the secondary source.
     '''
@@ -30,10 +31,26 @@ def DRO(Dx, Dy, n, stdx, stdy, tspan, SourceList, reverse=False):
     x = np.random.normal(loc=Secondary.x+Dx, scale=stdx, size=n)
     y = np.random.normal(loc=Secondary.y+Dy, scale=stdy, size=n)
     vx = np.ones(n)*vc*Dy/r
-    vy = -np.ones(n)*vc*Dx/r
-    #vy = -np.ones(n)*510
+    #vy = -np.ones(n)*vc*Dx/r
+    vy = -np.ones(n)*vy
     if reverse:
         vy *= -1
     for i in range(n):
         ProbeList.append(cl.probe(x[i], y[i], 0, vx[i], vy[i], 0, SourceList, tspan, omega))
     return ProbeList
+
+def Read_JPL_ics(filename, LU, TU, index, SourceList, tspan, omega):
+    D = pd.read_csv(filename)
+    ProbeList = []
+    for i in index:
+        x =  D.iloc[i, 1]*LU
+        y =  D.iloc[i, 2]*LU
+        z =  D.iloc[i, 3]*LU
+        vx = D.iloc[i, 4]*LU/TU
+        vy = D.iloc[i, 5]*LU/TU
+        vz = D.iloc[i, 6]*LU/TU
+        ProbeList.append(cl.probe(x, y, z, vx, vy, vz, SourceList, tspan, omega))
+    return ProbeList
+
+
+

@@ -7,20 +7,10 @@ import functions as f
 import init
 from classes import BigBody, probe
 from matplotlib.colors import SymLogNorm
+from Init_Solver import Bisection, Secant
 
-# Important parameters
-#BoxSize = c.rM*1.5 # Size of the animation box
-BoxSize = 10000e3 # m
-dt = 1e-3*c.day2s # Simulation time resolution
-resize = 25*BoxSize
-arrowsize = 2.5e-2*BoxSize
-tspan = 1*c.yr2s # s
-tail = 200 # frames
-SAVE_VIDEO = True
-
-# Some Constants
-frames = int(tspan/dt)
-Nframe = 5
+# Import the initial setup
+from setups.Earth_Moon_System import *
 
 # Figure
 plt.style.use('dark_background')
@@ -29,13 +19,6 @@ fig.set_facecolor('#303030')
 ax.set_facecolor('#303030')
 
 #SourceList, omega = Set_Sources(Msun, 0.05*Msun, rE)
-SourceList, omega = f.Set_Sources(c.ME, c.MM, c.rM)
-#ProbeList = init.Random_Around(rE*np.cos(np.pi/3)+SourceList[0].x, rE*np.sin(np.pi/3), 20, 1e7, 1e7)
-ProbeList = []
-#ProbeList += init.DRO(60000e3, 0, 1, 0, 0, tspan, SourceList, reverse=False)
-#ProbeList += init.DRO(30000e3, 0, 1, 0, 0, tspan, SourceList, reverse=False)
-#ProbeList += init.DRO(20000e3, 0, 1, 0, 0, tspan, SourceList, reverse=False)
-ProbeList += init.DRO(c.RM + 200e3, 0, 1, 0, 0, tspan, SourceList, reverse=False)
 
 # To record the position of the probes
 T = np.zeros((len(ProbeList), frames))
@@ -54,8 +37,6 @@ for i in tqdm(range(int(frames))):
         aCor[j,i,:] = Probe.acor[:2]
         aCen[j,i,:] = Probe.acen[:2]
         aG[j,i,:] = Probe.ag[:2]
-
-print(X, Y)
 
 # Lagrange point positions
 f.Plot_Static(SourceList, fig, ax)
@@ -79,7 +60,7 @@ def update(i):
     return dots + lines + arracors + arracens + arrags
 
 # Set Boxsize, etc.
-f.set_plot_dimensions(fig, ax, BoxSize, center=[SourceList[1].x, SourceList[1].y])
+f.set_plot_dimensions(fig, ax, BoxSize, center=[SourceList[0].x, SourceList[0].y])
 
 ani = animation.FuncAnimation(
     fig=fig, 
@@ -95,6 +76,6 @@ if SAVE_VIDEO:
         f.save_frame(   i, dt, frame, SourceList, ProbeList, 
                         X, Y, aCor, aCen, aG, 
                         fig, ax, BoxSize, tail, resize, arrowsize, 
-                        center=[SourceList[1].x, SourceList[1].y])
+                        center=[SourceList[0].x, SourceList[0].y])
 else:
     plt.show()
